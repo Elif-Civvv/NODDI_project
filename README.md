@@ -62,14 +62,14 @@ Compartment relaxation times: tissue (intra + extra) T2 = 100 ms, glial sphere T
 │   └── exp_a_4_visualize_results.py   [step 4] figures (posteriors, sweeps, accuracy/precision)
 │
 └── experiment_b/                   ← Experiment B: spatial HCP phantom
-    ├── exp_b_101_extract_priors.py    derive healthy-WM baselines from HCP NODDI maps (subject 100307)
-    ├── exp_b_102_extract_slice.py     extract axial slice (z=69) + WM mask (subject 100206)
+    ├── exp_b_101_extract_priors.py    derive healthy-WM baselines from HCP NODDI maps 
+    ├── exp_b_102_extract_slice.py     extract axial slice + WM mask 
     ├── exp_b_201_roi_adder.py         MAIN phantom generator (astro / edema / chronic_tbi,
     │                                  both protocols, full multi-TE glial signal)
     ├── exp_b_301_fit_mcmc_engine.py   per-voxel MCMC fitter (fixed-T2), parallel + checkpointing
-    ├── exp_b_401_fullwm_roc_cm.py     ROC + confusion matrices (Table 6, Figure 7)
-    ├── exp_b_402_recovery_audit.py    lesion + healthy recovery: bias / MAE / RMSE (Table 7)
-    ├── exp_b_403_convergence.py       per-voxel split-Rhat summary (Table 5)
+    ├── exp_b_401_fullwm_roc_cm.py     ROC + confusion matrices 
+    ├── exp_b_402_recovery_audit.py    lesion + healthy recovery: bias / MAE / RMSE 
+    ├── exp_b_403_convergence.py       per-voxel split-Rhat summary
     ├── exp_b_404_fullwm_spatial.py    spatial true-vs-predicted lesion maps
     ├── essential_hcp_compartments.py  vectorised compartment signals (arrays of b-values)
     ├── essential_bbdb_compartments.py sphere (GPD) compartment signal
@@ -78,13 +78,6 @@ Compartment relaxation times: tissue (intra + extra) T2 = 100 ms, glial sphere T
     └── essential_hcp_cube_parallel.py parallel NODDI fit of a WM cube (utility / sanity check,
                                        expects a 100307/ subfolder with wm_cube.nii, bvals, bvecs)
 ```
-
-> **Note on data and results.** The `results*/`, `try_*_results/`, `signals/`,
-> `chains/`, and `*.nii` data directories contain large generated artefacts and the
-> raw HCP inputs, which are **not** required to read the code and are excluded from
-> version control via `.gitignore` (see *Data* below). The repository ships the
-> code needed to regenerate them.
-
 ---
 
 ## Method summary

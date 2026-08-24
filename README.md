@@ -47,34 +47,36 @@ Compartment relaxation times: tissue (intra + extra) T2 = 100 ms, glial sphere T
 
 ```
 .
-├── README.md                  ← this file
+├── README.md                       ← this file
 ├── requirements.txt
 ├── .gitignore
 │
-├── experiment_a/              ← Experiment A: single-voxel sweep
-│   ├── essential_compartments.py      
-│   ├── essential_config.py            
-│   ├── essential_forward_models.py    
-│   ├── essential_sh_utils.py          
-│   ├── exp_a_1_simulate_data.py     [step 1] generate noisy synthetic signals
-│   ├── exp_a_2_solver_engine.py     [step 2] emcee MCMC inversion + split-Rhat
-│   ├── exp_a_3_analyze_metrics.py   [step 3] posterior summaries, convergence, pseudo-ROC
-│   └── exp_a_4_visualize_results.py [step 4] figures 
+├── experiment_a/                   ← Experiment A: single-voxel sweep
+│   ├── essential_config.py            constants, protocols, stage definitions, MCMC settings
+│   ├── essential_forward_models.py    compartment + full forward signal models
+│   ├── essential_compartments.py      analytical compartment signals (stick, sphere, ball, EC)
+│   ├── essential_sh_utils.py          Fibonacci sphere + spherical-harmonic utilities
+│   ├── exp_a_1_simulate_data.py       [step 1] generate noisy synthetic signals
+│   ├── exp_a_2_solver_engine.py       [step 2] emcee MCMC inversion + split-Rhat
+│   ├── exp_a_3_analyze_metrics.py     [step 3] posterior summaries, convergence, pseudo-ROC
+│   └── exp_a_4_visualize_results.py   [step 4] figures (posteriors, sweeps, accuracy/precision)
 │
-└── experiment_b/              ← Experiment B: spatial HCP phantom
-    ├── essential_bbdb_compartments.py     
-    ├── essential_bbdb_sh_utils.py         
-    ├── essential_check_speed.py           
-    ├── essential_hcp_compartments.py      
-    ├── essential_hcp_cube_parallel.py     
-    ├── exp_b_101_extract_priors.py        
-    ├── exp_b_102_extract_slice.py         
-    ├── exp_b_201_roi_adder.py       ← MAIN phantom generator 
-    ├── exp_b_301_fit_mcmc_engine.py       
-    ├── exp_b_401_fullwm_roc_cm.py         
-    ├── exp_b_402_recovery_audit.py        
-    ├── exp_b_403_convergence.py      
-    └── exp_b_404_fullwm_spatial.py
+└── experiment_b/                   ← Experiment B: spatial HCP phantom
+    ├── exp_b_101_extract_priors.py    derive healthy-WM baselines from HCP NODDI maps (subject 100307)
+    ├── exp_b_102_extract_slice.py     extract axial slice (z=69) + WM mask (subject 100206)
+    ├── exp_b_201_roi_adder.py         MAIN phantom generator (astro / edema / chronic_tbi,
+    │                                  both protocols, full multi-TE glial signal)
+    ├── exp_b_301_fit_mcmc_engine.py   per-voxel MCMC fitter (fixed-T2), parallel + checkpointing
+    ├── exp_b_401_fullwm_roc_cm.py     ROC + confusion matrices (Table 6, Figure 7)
+    ├── exp_b_402_recovery_audit.py    lesion + healthy recovery: bias / MAE / RMSE (Table 7)
+    ├── exp_b_403_convergence.py       per-voxel split-Rhat summary (Table 5)
+    ├── exp_b_404_fullwm_spatial.py    spatial true-vs-predicted lesion maps
+    ├── essential_hcp_compartments.py  vectorised compartment signals (arrays of b-values)
+    ├── essential_bbdb_compartments.py sphere (GPD) compartment signal
+    ├── essential_bbdb_sh_utils.py     Fibonacci sphere utilities
+    ├── essential_check_speed.py       time the fitter on a few voxels before a long job
+    └── essential_hcp_cube_parallel.py parallel NODDI fit of a WM cube (utility / sanity check,
+                                       expects a 100307/ subfolder with wm_cube.nii, bvals, bvecs)
 ```
 
 > **Note on data and results.** The `results*/`, `try_*_results/`, `signals/`,

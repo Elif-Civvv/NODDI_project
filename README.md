@@ -10,34 +10,11 @@ Author: Elif Civelekoglu · Supervisor: Dr. Amy Howard
 
 ## Overview
 
-Traumatic brain injury (TBI) triggers neuroinflammation (glial swelling) and
-axonal degeneration at the same time. Standard diffusion MRI cannot tell the two
-apart, because the widely used **NODDI** model has no glial compartment and
-acquires at a single echo time (TE). At a fixed TE every compartment contributes
-a signal equal to `v · exp(-TE/T2)` — the product of its volume fraction and its
-T2-weighting — so one measurement cannot separate volume fraction from
-relaxation. The fit is **degenerate**.
+Traumatic brain injury (TBI) triggers neuroinflammation (glial swelling) and axonal degeneration at the same time. Standard diffusion MRI cannot tell the two apart, because the widely used NODDI model has no glial compartment and acquires at a single echo time (TE). At a fixed TE every compartment contributes a signal equal to `v · exp(-TE/T2)`, which is the product of its volume fraction and its T2-weighting. So, one measurement cannot separate volume fraction from relaxation, making the fit degenerate
 
-This project tests, by simulation, whether adding a **restricted glial-sphere
-compartment** together with **multi-TE acquisition** and **compartment-specific
-T2 relaxation** resolves that degeneracy. It does so with two experiments built
-on a shared forward model, noise model, and Bayesian (MCMC) inference engine:
-
-- **Experiment A — single-voxel parameter sweep** (`noddi_project/`): sweeps the
-  glial fraction at one voxel and isolates the mathematical separability of the
-  glial compartment. Reported with T2 estimated freely, which exposes the
-  degeneracy directly.
-- **Experiment B — spatially realistic white-matter phantom** (`phantom_hcp/`):
-  embeds synthetic TBI lesions in a real HCP white-matter slice and tests whether
-  recovery survives variable fibre orientation and per-voxel noise. Reported with
-  T2 fixed at ground truth, which yields interpretable spatial recovery maps.
-
-**Headline result.** Once the relaxation degeneracy is constrained, both a
-glia-added NODDI (gaNODDI) and the novel multi-TE protocol recover the glial
-fraction accurately under **astrogliosis** (AUC 1.000). Both **fail under
-vasogenic edema**, leaking free-water signal into the glial channel and misreading
-a true glial fraction of zero as inflammation. Multi-TE is a promising direction,
-but is limited where the underlying change is a pure free-water perturbation.
+This project tests, by simulation, whether adding a restricted glial-sphere compartment together with multi-TE acquisition and compartment-specific T2 relaxation resolves that degeneracy. It does so with two experiments built on a shared forward model, noise model, and Bayesian (MCMC) inference engine:
+- **Experiment A — single-voxel parameter sweep** (`noddi_project/`): sweeps the  glial fraction at one voxel and isolates the mathematical separability of the glial compartment. Reported with T2 estimated freely, which exposes the degeneracy directly.
+- **Experiment B — spatially realistic white-matter phantom** (`phantom_hcp/`): embeds synthetic TBI lesions in a real HCP white-matter slice and tests whether recovery survives variable fibre orientation and per-voxel noise. Reported with T2 fixed at ground truth, which yields interpretable spatial recovery maps.
 
 ---
 
@@ -51,10 +28,7 @@ but is limited where the underlying change is a pure free-water perturbation.
 | b=0 volumes | 6 | 6 per TE |
 | Total measurements | 198 | 402 |
 
-Shared PGSE timings: big Δ = 43.1 ms, little δ = 10.6 ms. Glial cells are
-modelled as restricted spheres via the Gaussian Phase Distribution (GPD)
-approximation with radius R = 5.0 µm and diffusivity D = 3.0 µm²/ms. Signals are
-corrupted with Rician noise at SNR = 20.
+Shared PGSE timings: big Δ = 43.1 ms, little δ = 10.6 ms. Glial cells are modelled as restricted spheres via the Gaussian Phase Distribution (GPD) approximation with radius R = 5.0 µm and diffusivity D = 3.0 µm²/ms. Signals are corrupted with Rician noise at SNR = 20.
 
 ### Ground-truth tissue parameters
 
@@ -65,8 +39,7 @@ corrupted with Rician noise at SNR = 20.
 | Edema | 0.65 | 0.25 | 0.45 | 0.00 |
 | Chronic TBI | 0.55 | 0.50 | 0.35 | 0.15 |
 
-Compartment relaxation times: tissue (intra + extra) T2 = 100 ms, glial sphere
-T2 = 30 ms, free water (CSF) T2 = 2000 ms.
+Compartment relaxation times: tissue (intra + extra) T2 = 100 ms, glial sphere T2 = 30 ms, free water (CSF) T2 = 2000 ms.
 
 ---
 
@@ -129,17 +102,13 @@ T2 = 30 ms, free water (CSF) T2 = 2000 ms.
 
 ### Forward signal models
 
-The standard three-compartment NODDI signal is a volume-weighted sum of a
-restricted intra-cellular "stick" population (Watson-dispersed, integrated over
-500 Fibonacci samples), a tortuosity-constrained hindered extra-cellular tensor,
-and an isotropic free-water ball:
+The standard three-compartment NODDI signal is a volume-weighted sum of a restricted intra-cellular stick population (Watson-dispersed, integrated over 500 Fibonacci samples), a tortuosity-constrained hindered extra-cellular tensor, and an isotropic free-water ball:
 
 ```
 S_NODDI = (1 - v_iso) · [ v_ic·A_ic + (1 - v_ic)·A_ec ] + v_iso·A_iso
 ```
 
-The novel model adds a restricted glial sphere and attaches a
-compartment-specific T2 weight `exp(-TE/T2)` to every compartment:
+The novel model adds a restricted glial sphere and attaches a compartment-specific T2 weight `exp(-TE/T2)` to every compartment:
 
 ```
 S_novel = (1 - v_iso) · [ (1 - v_glia)·(v_ic·A_ic + (1-v_ic)·A_ec)·e^(-TE/T2,t)
@@ -147,16 +116,11 @@ S_novel = (1 - v_iso) · [ (1 - v_glia)·(v_ic·A_ic + (1-v_ic)·A_ec)·e^(-TE/T
         +  v_iso·A_iso·e^(-TE/T2,c)
 ```
 
-evaluated at each TE in the protocol. Compartment signal functions live in
-`bbdb_compartments.py` (and the vectorised `hcp_compartments.py` for the spatial
-phantom).
+evaluated at each TE in the protocol. Compartment signal functions live in `bbdb_compartments.py` (and the vectorised `hcp_compartments.py` for the spatial phantom).
 
 ### Bayesian inference
 
-Model inversion uses MCMC with the **emcee** ensemble sampler. Each fit is
-warm-started with a multi-start L-BFGS-B optimiser, then sampled with a mixture
-of Differential Evolution (80%) and DE-Snooker (20%) moves to traverse correlated
-posterior ridges. Priors are uniform within biologically plausible bounds:
+Model inversion uses MCMC with the **emcee** ensemble sampler. Each fit is warm-started with a multi-start L-BFGS-B optimiser, then sampled with a mixture of Differential Evolution (80%) and DE-Snooker (20%) moves to traverse correlated posterior ridges. Priors are uniform within biologically plausible bounds:
 
 | Parameter | Symbol | Lower | Upper |
 |---|---|---|---|
@@ -169,30 +133,20 @@ posterior ridges. Priors are uniform within biologically plausible bounds:
 | Fibre elevation | θ | 0 | π |
 | Fibre azimuth | φ | 0 | 2π |
 
-A Gaussian log-likelihood is used as a high-SNR approximation to the Rician noise
-(σ = mean b=0 signal / SNR). Convergence is assessed by integrated
-autocorrelation time and **split-Rhat** (Rhat < 1.1 = acceptable mixing).
+A Gaussian log-likelihood is used as a high-SNR approximation to the Rician noise (σ = mean b=0 signal / SNR). Convergence is assessed by integrated autocorrelation time and **split-Rhat** (Rhat < 1.1 = acceptable mixing).
 
-Experiment A uses 56 walkers and long chains (config: 40 000 steps, 10 000
-burn-in) over a glia sweep `v_glia ∈ {0.00, 0.10, 0.20, 0.30}` and a staged
-fit ladder (stages 1–6 in `1205_config.py`, from a sanity NODDI fit through the
-full free-T2 fit). Experiment B fits each white-matter voxel independently under
-the lower-dimensional fixed-T2 configuration (32 walkers, ~4000 steps,
-400 burn-in).
+Experiment A uses 56 walkers and long chains (config: 40 000 steps, 10 000 burn-in) over a glia sweep `v_glia ∈ {0.00, 0.10, 0.20, 0.30}` and a staged fit ladder (stages 1–6 in `1205_config.py`, from a sanity NODDI fit through the full free-T2 fit). Experiment B fits each white-matter voxel independently under the lower-dimensional fixed-T2 configuration (32 walkers, ~4000 steps, 400 burn-in).
 
 ### Evaluation
 
-- **Experiment A:** posterior median, relative bias, and 68% credible-interval
-  width per parameter.
-- **Experiment B:** per-ROI bias / MAE / RMSE; global Pearson correlation; and a
-  pseudo-ROC analysis (AUC, Youden-optimal threshold, sensitivity, specificity,
-  precision) classifying lesion vs healthy WM from the posterior v_glia.
+- **Experiment A:** posterior median, relative bias, and 68% credible-interval width per parameter.
+- **Experiment B:** per-ROI bias / MAE / RMSE; global Pearson correlation; and a pseudo-ROC analysis (AUC, Youden-optimal threshold, sensitivity, specificity, precision) classifying lesion vs healthy WM from the posterior v_glia.
 
 ---
 
 ## Installation
 
-Python 3.9+ recommended.
+Python 3.9+ needed.
 
 ```bash
 python -m venv .venv
@@ -200,8 +154,7 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Core dependencies: `numpy`, `scipy`, `emcee`, `nibabel`, `matplotlib`, `corner`,
-`scikit-learn` (`numba` optional, only for the whole-brain NODDI map utilities).
+Core dependencies: `numpy`, `scipy`, `emcee`, `nibabel`, `matplotlib`, `corner`, `scikit-learn` (`numba` optional, only for the whole-brain NODDI map utilities).
 
 ---
 

@@ -1,0 +1,39 @@
+#!/bin/bash
+#PBS -N noddi_pipeline
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=8:mem=16gb
+#PBS -o noddi_pipeline.out
+#PBS -e noddi_pipeline.err
+
+# --- Load modules ---
+module load anaconda3/personal 2>/dev/null || module load python/3 2>/dev/null
+echo "Python: $(which python3)"
+echo "Started: $(date)"
+
+# --- Move to project directory ---
+cd $HOME/noddi_project || exit 1
+
+# --- Install dependencies (first run only) ---
+pip install --user emcee corner matplotlib scipy numpy 2>/dev/null
+
+# --- Run pipeline in order ---
+echo "============================================"
+echo "STEP 2/4: solver"
+echo "============================================"
+python3 1205_solver_engine.py
+if [ $? -ne 0 ]; then echo "STEP 2 FAILED"; exit 1; fi
+
+echo "============================================"
+echo "STEP 3/4: Analyze metrics"
+echo "============================================"
+python3 1205_analyze_metrics.py
+if [ $? -ne 0 ]; then echo "STEP 3 FAILED"; exit 1; fi
+
+echo "============================================"
+echo "STEP 4/4: make figures"
+echo "============================================"
+python3 1205.py
+if [ $? -ne 0 ]; then echo "STEP 3 FAILED"; exit 1; fi
+
+echo "DONE: $(date)"
+

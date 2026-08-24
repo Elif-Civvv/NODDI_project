@@ -1,0 +1,19 @@
+# Core scientific stack
+numpy
+scipy
+
+# Bayesian inference
+emcee
+corner
+
+# Neuroimaging I/O (Experiment B)
+nibabel
+
+# Plotting
+matplotlib
+
+# Metrics (ROC / AUC for Experiment B)
+scikit-learn
+
+# Optional: only needed for the whole-brain NODDI map utilities
+numba

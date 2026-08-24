@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 1205_analyze_metrics.py
 =======================

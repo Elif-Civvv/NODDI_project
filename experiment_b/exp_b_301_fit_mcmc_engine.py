@@ -8,12 +8,12 @@ from scipy.optimize import minimize
 import emcee
 
 try:
-    from hcp_compartments import (
+    from essential_hcp_compartments import (
         calculate_watson_stick_signal,
         calculate_noddi_extra_signal,
     )
-    from bbdb_compartments import calculate_sphere_signal
-    from bbdb_sh_utils import fibonacci_sphere
+    from essential_bbdb_compartments import calculate_sphere_signal
+    from essential_bbdb_sh_utils import fibonacci_sphere
 except ImportError:
     raise ImportError("Ensure compartment and sh_utils files are accessible.")
 

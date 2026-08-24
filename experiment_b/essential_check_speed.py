@@ -20,7 +20,7 @@ import numpy as np
 import nibabel as nib
 
 # Import the production engine so timing reflects the real fit.
-import fit_mcmc_engine as eng
+import exp_b_301_fit_mcmc_engine as eng
 
 
 def main():

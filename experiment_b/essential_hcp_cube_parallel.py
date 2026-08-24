@@ -7,14 +7,14 @@ from scipy.optimize import differential_evolution
 
 # 1. IMPORT UTILITIES
 try:
-    from hcp_compartments import (
+    from essential_hcp_compartments import (
         calculate_ball_signal,
         calculate_watson_stick_signal,
         calculate_noddi_extra_signal
     )
-    from bbdb_sh_utils import fibonacci_sphere
+    from essential_bbdb_sh_utils import fibonacci_sphere
 except ImportError:
-    raise ImportError("Ensure hcp_compartments.py and bbdb_sh_utils.py are in this folder.")
+    raise ImportError("Ensure essential_hcp_compartments.py and essential_bbdb_sh_utils.py are in this folder.")
 
 # 2. CONSTANTS
 D_par = 1.7

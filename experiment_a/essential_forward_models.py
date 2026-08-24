@@ -19,7 +19,7 @@ import importlib
 import numpy as np
 
 # -- sibling import (module name starts with a digit) -----------------------
-cfg = importlib.import_module("1205_config")
+cfg = importlib.import_module("essential_config")
 
 S_0          = cfg.S_0
 D_PAR        = cfg.D_PAR
@@ -40,7 +40,7 @@ gradient_strength_for_b = cfg.gradient_strength_for_b
 angles_to_mu = cfg.angles_to_mu
 
 # -- upstream library imports -----------------------------------------------
-from bbdb_compartments import (
+from essential_compartments import (
     calculate_watson_stick_signal,
     calculate_noddi_extra_signal,
     calculate_sphere_signal,

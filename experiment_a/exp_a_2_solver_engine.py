@@ -30,8 +30,8 @@ import emcee
 import numpy as np
 from scipy.optimize import minimize
 
-cfg = importlib.import_module("1205_config")
-fwd = importlib.import_module("1205_forward_models")
+cfg = importlib.import_module("essential_config")
+fwd = importlib.import_module("essential_forward_models")
 
 CHAINS_DIR       = cfg.CHAINS_DIR
 SIGNALS_DIR      = cfg.SIGNALS_DIR

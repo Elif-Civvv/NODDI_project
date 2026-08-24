@@ -19,8 +19,8 @@ import os
 
 import numpy as np
 
-cfg = importlib.import_module("1205_config")
-fwd = importlib.import_module("1205_forward_models")
+cfg = importlib.import_module("essential_config")
+fwd = importlib.import_module("essential_forward_models")
 
 SIGNALS_DIR  = cfg.SIGNALS_DIR
 PROTOCOLS    = cfg.PROTOCOLS

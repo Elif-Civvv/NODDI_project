@@ -34,7 +34,11 @@ try:
 except ImportError:
     HAS_CORNER = False
 
-cfg = importlib.import_module("1205_config")
+# NumPy 2.0 removed np.trapz in favour of np.trapezoid. Bind whichever
+# the installed version provides so this runs on NumPy 1.x and 2.x alike.
+_trapezoid = getattr(np, "trapezoid", None) or np.trapz
+
+cfg = importlib.import_module("essential_config")
 
 CHAINS_DIR        = cfg.CHAINS_DIR
 SIGNALS_DIR       = cfg.SIGNALS_DIR
@@ -676,9 +680,11 @@ def plot_classification_roc():
         tpr = np.array([np.mean(samples_i >= t) for t in thresholds])
         fpr = np.array([np.mean(samples_h >= t) for t in thresholds])
 
-        # AUC via trapezoidal rule (sort by FPR ascending)
+        # AUC via trapezoidal rule (sort by FPR ascending).
+        # np.trapz was removed in NumPy 2.0 and renamed np.trapezoid;
+        # _trapezoid picks whichever the installed NumPy provides.
         order = np.argsort(fpr)
-        auc = np.trapz(tpr[order], fpr[order])
+        auc = _trapezoid(tpr[order], fpr[order])
 
         ax.plot(fpr, tpr, color=PROTO_COLOUR[proto_name], lw=2,
                 label=f"{PROTOCOLS[proto_name].label}  (AUC={auc:.3f})")

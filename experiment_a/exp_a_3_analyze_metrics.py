@@ -28,7 +28,7 @@ import os
 
 import numpy as np
 
-cfg = importlib.import_module("1205_config")
+cfg = importlib.import_module("essential_config")
 
 CHAINS_DIR       = cfg.CHAINS_DIR
 METRICS_DIR      = cfg.METRICS_DIR
